@@ -33,18 +33,6 @@ jobs:
           nexusReleasesUrl=https://repo.moonrise.gg/repository/maven-releases
           EOF
 
-      # Modify version for release branch (remove -SNAPSHOT)
-      - name: Modify version for release
-        if: github.ref == 'refs/heads/release'
-        run: |
-          find . -name "build.gradle.kts" -type f -exec sed -i "s/\\(var apiVersion = \\\"[^\\\"]*\\)-SNAPSHOT\\\"/\\1\\\"/" {} +
-
-      # Modify version for snapshot branch (add -SNAPSHOT if not present)
-      - name: Modify version for snapshot
-        if: github.ref == 'refs/heads/snapshot'
-        run: |
-          find . -name "build.gradle.kts" -type f -exec sed -i "/var apiVersion = \\\".*-SNAPSHOT\\\"/! s/\\(var apiVersion = \\\"[^\\\"]*\\)\\\"/\\1-SNAPSHOT\\\"/" {} +
-
       # Make gradlew executable
       - name: Make gradlew executable
         run: chmod +x ./gradlew

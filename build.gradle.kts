@@ -7,23 +7,17 @@ plugins {
 var id = "folia-scheduler"
 var domain = "gg.moonrise.scheduler"
 var apiVersion = "1.0.0"
+val isRelease = providers.gradleProperty("isRelease").map(String::toBoolean).getOrElse(false)
+val publishVersion = if (isRelease) apiVersion else "$apiVersion-SNAPSHOT"
 
 repositories {
     mavenCentral()
 
-    // Moonrise
-    maven("https://repo.moonrise.gg/repository/maven-releases/")
-    maven("https://repo.moonrise.gg/repository/maven-snapshots/")
-
     // PaperMC
     maven("https://repo.papermc.io/repository/maven-public/")
-
-    // HelpChat
-    maven("https://repo.helpch.at/releases")
 }
 
 dependencies {
-
     // Paper
     compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
 }
@@ -60,7 +54,7 @@ publishing {
 
             groupId = domain
             artifactId = id
-            version = apiVersion
+            version = publishVersion
 
             pom {
                 name.set(id)
@@ -80,6 +74,27 @@ publishing {
                         name.set("Eric")
                     }
                 }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "moonriseNexus"
+            url = uri(
+                providers.gradleProperty(if (isRelease) "nexusReleasesUrl" else "nexusSnapshotsUrl")
+                    .getOrElse(
+                        if (isRelease) {
+                            "https://repo.moonrise.gg/repository/maven-releases"
+                        } else {
+                            "https://repo.moonrise.gg/repository/maven-snapshots"
+                        }
+                    )
+            )
+
+            credentials {
+                username = providers.gradleProperty("nexusUsername").orNull
+                password = providers.gradleProperty("nexusPassword").orNull
             }
         }
     }
