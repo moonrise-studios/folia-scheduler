@@ -15,24 +15,101 @@ scheduler choice shorter and more consistent.
 
 ## Dependency
 
-Add the Moonrise repository and depend on the scheduler artifact.
+Add the Moonrise repository to your Gradle build.
 
-```kotlin
+```diff
 repositories {
-    maven("https://repo.moonrise.gg/repository/maven-releases")
-    maven("https://repo.moonrise.gg/repository/maven-snapshots")
-}
-
-dependencies {
-    compileOnly("gg.moonrise.scheduler:folia-scheduler:1.0.0")
-    // Or, while testing unreleased changes:
-    // compileOnly("gg.moonrise.scheduler:folia-scheduler:1.0.0-SNAPSHOT")
+    mavenCentral()
++   maven("https://repo.moonrise.gg/repository/maven-releases")
++   maven("https://repo.moonrise.gg/repository/maven-snapshots")
 }
 ```
 
-The published artifact is built against Paper and should usually be treated like
-other Paper-facing plugin dependencies: compile against it, then ensure it is
-available to your plugin at runtime by your normal dependency strategy.
+Choose one runtime strategy for your plugin: load the dependency at runtime with
+Paper, or shade and relocate it into your plugin jar. `compileOnly` by itself is
+not enough at runtime.
+
+### Paper Runtime Dependency Loader
+
+Use `compileOnly` when your plugin loads the scheduler artifact through Paper's
+runtime dependency loader.
+
+```diff
+dependencies {
++   compileOnly("gg.moonrise.scheduler:folia-scheduler:1.0.0")
++   // Or, while testing unreleased changes:
++   // compileOnly("gg.moonrise.scheduler:folia-scheduler:1.0.0-SNAPSHOT")
+}
+```
+
+Add the loader to `paper-plugin.yml`.
+
+```diff
+name: ExamplePlugin
+version: '1.0.0'
+main: com.example.myplugin.MyPlugin
+api-version: '1.21'
++ loader: com.example.myplugin.MyPluginLoader
+```
+
+Then add the scheduler artifact to the plugin classpath from that loader.
+
+```diff
+package com.example.myplugin;
+
+import io.papermc.paper.plugin.loader.PluginClasspathBuilder;
+import io.papermc.paper.plugin.loader.PluginLoader;
++import io.papermc.paper.plugin.loader.library.impl.MavenLibraryResolver;
++import org.eclipse.aether.artifact.DefaultArtifact;
++import org.eclipse.aether.graph.Dependency;
++import org.eclipse.aether.repository.RemoteRepository;
+
+public final class MyPluginLoader implements PluginLoader {
+
+    @Override
+    public void classloader(PluginClasspathBuilder classpathBuilder) {
++       MavenLibraryResolver resolver = new MavenLibraryResolver();
++       resolver.addRepository(new RemoteRepository.Builder(
++               "moonrise-releases",
++               "default",
++               "https://repo.moonrise.gg/repository/maven-releases"
++       ).build());
++       resolver.addRepository(new RemoteRepository.Builder(
++               "moonrise-snapshots",
++               "default",
++               "https://repo.moonrise.gg/repository/maven-snapshots"
++       ).build());
++       resolver.addDependency(new Dependency(
++               new DefaultArtifact("gg.moonrise.scheduler:folia-scheduler:1.0.0"),
++               null
++       ));
++
++       classpathBuilder.addLibrary(resolver);
+    }
+}
+```
+
+### Shaded Dependency
+
+Use `implementation` when your plugin bundles the scheduler into its own jar.
+Shade and relocate the scheduler package so your bundled copy cannot collide
+with another plugin's copy.
+
+```diff
+plugins {
++   id("com.gradleup.shadow") version("9.2.2")
+}
+
+dependencies {
++   implementation("gg.moonrise.scheduler:folia-scheduler:1.0.0")
+}
+
+tasks.shadowJar {
++   relocate("gg.moonrise.scheduler", "com.example.myplugin.libs.foliascheduler")
+}
+```
+
+Package and distribute the Shadow jar, not the plain jar.
 
 ## Initialize
 
