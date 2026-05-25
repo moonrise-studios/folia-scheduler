@@ -7,6 +7,8 @@ plugins {
 var id = "folia-scheduler"
 var domain = "gg.moonrise.scheduler"
 var apiVersion = "1.0.0"
+val isRelease = providers.gradleProperty("isRelease").map(String::toBoolean).getOrElse(false)
+val publishVersion = if (isRelease) apiVersion else "$apiVersion-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -52,7 +54,7 @@ publishing {
 
             groupId = domain
             artifactId = id
-            version = apiVersion
+            version = publishVersion
 
             pom {
                 name.set(id)
@@ -72,6 +74,27 @@ publishing {
                         name.set("Eric")
                     }
                 }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "moonriseNexus"
+            url = uri(
+                providers.gradleProperty(if (isRelease) "nexusReleasesUrl" else "nexusSnapshotsUrl")
+                    .getOrElse(
+                        if (isRelease) {
+                            "https://repo.moonrise.gg/repository/maven-releases"
+                        } else {
+                            "https://repo.moonrise.gg/repository/maven-snapshots"
+                        }
+                    )
+            )
+
+            credentials {
+                username = providers.gradleProperty("nexusUsername").orNull
+                password = providers.gradleProperty("nexusPassword").orNull
             }
         }
     }
