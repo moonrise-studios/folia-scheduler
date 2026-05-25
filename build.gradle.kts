@@ -11,19 +11,11 @@ var apiVersion = "1.0.0"
 repositories {
     mavenCentral()
 
-    // Moonrise
-    maven("https://repo.moonrise.gg/repository/maven-releases/")
-    maven("https://repo.moonrise.gg/repository/maven-snapshots/")
-
     // PaperMC
     maven("https://repo.papermc.io/repository/maven-public/")
-
-    // HelpChat
-    maven("https://repo.helpch.at/releases")
 }
 
 dependencies {
-
     // Paper
     compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
 }
