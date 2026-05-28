@@ -8,24 +8,35 @@ import java.time.Duration;
 import java.util.function.Consumer;
 
 /**
- * Represents the EntityScheduler class.
+ * Convenience wrapper around Paper's entity scheduler.
+ * <p>
+ * Use this scheduler for work owned by a specific entity: player messages,
+ * inventory mutation, teleports, entity mutation, entity removal, and async
+ * callback handoff back to an entity.
  */
 public class EntityScheduler {
 
     private final JavaPlugin plugin;
     private final Entity entity;
 
+    /**
+     * Creates a scheduler wrapper bound to one entity.
+     *
+     * @param plugin plugin instance used as the scheduler task owner
+     * @param entity entity that owns scheduled work
+     */
     public EntityScheduler(JavaPlugin plugin, Entity entity) {
         this.plugin = plugin;
         this.entity = entity;
     }
 
     /**
-     * Execute a Runnable task associated with the entity.
-     * @param task The task to execute
-     * @param retired The task to run when the main task is retired (optional)
-     * @param delay The delay in ticks before executing the task
-     * @return true if the task was successfully scheduled, false otherwise
+     * Executes a runnable on the entity scheduler after a tick delay.
+     *
+     * @param task task to execute
+     * @param retired optional callback run by Paper when the entity scheduler is retired
+     * @param delay delay in server ticks
+     * @return {@code true} if Paper accepted the task
      */
     public boolean execute(Runnable task, Runnable retired, long delay) {
         return scheduler().execute(
@@ -37,11 +48,14 @@ public class EntityScheduler {
     }
 
     /**
-     * Execute a Runnable task associated with the entity.
-     * @param task The task to execute
-     * @param retired The task to run when the main task is retired (optional)
-     * @param delay The delay before executing the task
-     * @return true if the task was successfully scheduled, false otherwise
+     * Executes a runnable on the entity scheduler after a duration delay.
+     * <p>
+     * The duration is converted to ticks with {@code delay.toMillis() / 50}.
+     *
+     * @param task task to execute
+     * @param retired optional callback run by Paper when the entity scheduler is retired
+     * @param delay delay before executing the task
+     * @return {@code true} if Paper accepted the task
      */
     public boolean execute(Runnable task, Runnable retired, Duration delay) {
         return scheduler().execute(
@@ -53,30 +67,35 @@ public class EntityScheduler {
     }
 
     /**
-     * Execute a Runnable task associated with the entity.
-     * @param task The task to execute
-     * @param delay The delay in ticks before executing the task
-     * @return true if the task was successfully scheduled, false otherwise
+     * Executes a runnable on the entity scheduler after a tick delay.
+     *
+     * @param task task to execute
+     * @param delay delay in server ticks
+     * @return {@code true} if Paper accepted the task
      */
     public boolean execute(Runnable task, long delay) {
         return execute(task, null, delay);
     }
 
     /**
-     * Execute a Runnable task associated with the entity.
-     * @param task The task to execute
-     * @param delay The delay before executing the task
-     * @return true if the task was successfully scheduled, false otherwise
+     * Executes a runnable on the entity scheduler after a duration delay.
+     * <p>
+     * The duration is converted to ticks with {@code delay.toMillis() / 50}.
+     *
+     * @param task task to execute
+     * @param delay delay before executing the task
+     * @return {@code true} if Paper accepted the task
      */
     public boolean execute(Runnable task, Duration delay) {
         return execute(task, null, delay);
     }
 
     /**
-     * Run a task associated with the entity.
-     * @param task The task to run
-     * @param retired The task to run when the main task is retired (optional)
-     * @return The ScheduledTask representing the scheduled task
+     * Runs a scheduled task on the entity scheduler.
+     *
+     * @param task task to run
+     * @param retired optional callback run by Paper when the entity scheduler is retired
+     * @return scheduled task handle
      */
     public ScheduledTask run(Consumer<ScheduledTask> task, Runnable retired) {
         return scheduler().run(
@@ -87,20 +106,22 @@ public class EntityScheduler {
     }
 
     /**
-     * Run a task associated with the entity.
-     * @param task The task to run
-     * @return The ScheduledTask representing the scheduled task
+     * Runs a scheduled task on the entity scheduler.
+     *
+     * @param task task to run
+     * @return scheduled task handle
      */
     public ScheduledTask run(Consumer<ScheduledTask> task) {
         return run(task, null);
     }
 
     /**
-     * Run a task associated with the entity after a delay.
-     * @param task The task to run
-     * @param retired The task to run when the main task is retired (optional)
-     * @param delayTicks The delay in ticks before running the task
-     * @return The ScheduledTask representing the scheduled task
+     * Runs a scheduled task on the entity scheduler after a tick delay.
+     *
+     * @param task task to run
+     * @param retired optional callback run by Paper when the entity scheduler is retired
+     * @param delayTicks delay in server ticks
+     * @return scheduled task handle
      */
     public ScheduledTask runDelayed(Consumer<ScheduledTask> task, Runnable retired, long delayTicks) {
         return scheduler().runDelayed(
@@ -112,21 +133,25 @@ public class EntityScheduler {
     }
 
     /**
-     * Run a task associated with the entity after a delay.
-     * @param task The task to run
-     * @param delayTicks The delay in ticks before running the task
-     * @return The ScheduledTask representing the scheduled task
+     * Runs a scheduled task on the entity scheduler after a tick delay.
+     *
+     * @param task task to run
+     * @param delayTicks delay in server ticks
+     * @return scheduled task handle
      */
     public ScheduledTask runDelayed(Consumer<ScheduledTask> task, long delayTicks) {
         return runDelayed(task, null, delayTicks);
     }
 
     /**
-     * Run a task associated with the entity after a delay.
-     * @param task The task to run
-     * @param retired The task to run when the main task is retired (optional)
-     * @param delay The delay before running the task
-     * @return The ScheduledTask representing the scheduled task
+     * Runs a scheduled task on the entity scheduler after a duration delay.
+     * <p>
+     * The duration is converted to ticks with {@code delay.toMillis() / 50}.
+     *
+     * @param task task to run
+     * @param retired optional callback run by Paper when the entity scheduler is retired
+     * @param delay delay before running the task
+     * @return scheduled task handle
      */
     public ScheduledTask runDelayed(Consumer<ScheduledTask> task, Runnable retired, Duration delay) {
         return scheduler().runDelayed(
@@ -138,22 +163,26 @@ public class EntityScheduler {
     }
 
     /**
-     * Run a task associated with the entity after a delay.
-     * @param task The task to run
-     * @param delay The delay before running the task
-     * @return The ScheduledTask representing the scheduled task
+     * Runs a scheduled task on the entity scheduler after a duration delay.
+     * <p>
+     * The duration is converted to ticks with {@code delay.toMillis() / 50}.
+     *
+     * @param task task to run
+     * @param delay delay before running the task
+     * @return scheduled task handle
      */
     public ScheduledTask runDelayed(Consumer<ScheduledTask> task, Duration delay) {
         return runDelayed(task, null, delay);
     }
 
     /**
-     * Schedule a repeating task associated with the entity.
-     * @param task The task to run
-     * @param retired The task to run when the main task is retired (optional)
-     * @param delayTicks The delay in ticks before running the task
-     * @param periodTicks The period in ticks between successive runs of the task
-     * @return The ScheduledTask representing the scheduled task
+     * Schedules a repeating task on the entity scheduler.
+     *
+     * @param task task to run
+     * @param retired optional callback run by Paper when the entity scheduler is retired
+     * @param delayTicks initial delay in server ticks
+     * @param periodTicks period between executions in server ticks
+     * @return scheduled task handle
      */
     public ScheduledTask schedule(Consumer<ScheduledTask> task, Runnable retired, long delayTicks, long periodTicks) {
         return scheduler().runAtFixedRate(
@@ -166,23 +195,27 @@ public class EntityScheduler {
     }
 
     /**
-     * Schedule a repeating task associated with the entity.
-     * @param task The task to run
-     * @param delayTicks The delay in ticks before running the task
-     * @param periodTicks The period in ticks between successive runs of the task
-     * @return The ScheduledTask representing the scheduled task
+     * Schedules a repeating task on the entity scheduler.
+     *
+     * @param task task to run
+     * @param delayTicks initial delay in server ticks
+     * @param periodTicks period between executions in server ticks
+     * @return scheduled task handle
      */
     public ScheduledTask schedule(Consumer<ScheduledTask> task, long delayTicks, long periodTicks) {
         return schedule(task, null, delayTicks, periodTicks);
     }
 
     /**
-     * Schedule a repeating task associated with the entity.
-     * @param task The task to run
-     * @param retired The task to run when the main task is retired (optional)
-     * @param delay The delay before running the task
-     * @param period The period between successive runs of the task
-     * @return The ScheduledTask representing the scheduled task
+     * Schedules a repeating task on the entity scheduler.
+     * <p>
+     * Durations are converted to ticks with {@code duration.toMillis() / 50}.
+     *
+     * @param task task to run
+     * @param retired optional callback run by Paper when the entity scheduler is retired
+     * @param delay initial delay
+     * @param period period between executions
+     * @return scheduled task handle
      */
     public ScheduledTask schedule(Consumer<ScheduledTask> task, Runnable retired, Duration delay, Duration period) {
         return scheduler().runAtFixedRate(
@@ -195,19 +228,23 @@ public class EntityScheduler {
     }
 
     /**
-     * Schedule a repeating task associated with the entity.
-     * @param task The task to run
-     * @param delay The delay before running the task
-     * @param period The period between successive runs of the task
-     * @return The ScheduledTask representing the scheduled task
+     * Schedules a repeating task on the entity scheduler.
+     * <p>
+     * Durations are converted to ticks with {@code duration.toMillis() / 50}.
+     *
+     * @param task task to run
+     * @param delay initial delay
+     * @param period period between executions
+     * @return scheduled task handle
      */
     public ScheduledTask schedule(Consumer<ScheduledTask> task, Duration delay, Duration period) {
         return schedule(task, null, delay, period);
     }
 
     /**
-     * Get the underlying EntityScheduler
-     * @return The EntityScheduler instance
+     * Returns the underlying Paper entity scheduler for this entity.
+     *
+     * @return Paper entity scheduler
      */
     public io.papermc.paper.threadedregions.scheduler.EntityScheduler scheduler() {
         return entity.getScheduler();
