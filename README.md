@@ -151,6 +151,8 @@ The safest default is: if you have a `Player` or `Entity`, use
 `Scheduler.entity(...)`; if you have a `Location`, `Block`, or `Chunk`, use
 `Scheduler.location()`; use `Scheduler.sync()` only for truly global work.
 
+For quick copyable examples, see [Usage Recipes](docs/usage.md).
+
 ## Entity-Owned Work
 
 Entity scheduling is the right choice for player-facing async callbacks. Load
