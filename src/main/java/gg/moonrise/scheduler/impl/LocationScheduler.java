@@ -11,33 +11,45 @@ import java.time.Duration;
 import java.util.function.Consumer;
 
 /**
- * Represents the LocationScheduler class.
+ * Convenience wrapper around Paper's region scheduler.
+ * <p>
+ * Use this scheduler for block, chunk, world, region, and location-owned state.
+ * Prefer {@code Scheduler.entity(entity)} when the work is owned by a player or
+ * other entity.
  */
 public class LocationScheduler {
 
     private final JavaPlugin plugin;
     private final RegionScheduler scheduler;
 
+    /**
+     * Creates a wrapper for Paper's region scheduler.
+     *
+     * @param plugin plugin instance used as the scheduler task owner
+     * @param scheduler Paper region scheduler
+     */
     public LocationScheduler(JavaPlugin plugin, RegionScheduler scheduler) {
         this.plugin = plugin;
         this.scheduler = scheduler;
     }
 
     /**
-     * Execute a task in the region of the given location
-     * @param location The location to execute the task in
-     * @param task The task to execute
+     * Executes a runnable in the region that owns a location.
+     *
+     * @param location location whose region owns the work
+     * @param task task to execute
      */
     public void executeLocation(Location location, Runnable task) {
         scheduler.execute(plugin, location, task);
     }
 
     /**
-     * Execute a task in the region of the given chunk coordinates
-     * @param world The world of the chunk
-     * @param chunkX The x coordinate of the chunk
-     * @param chunkZ The z coordinate of the chunk
-     * @param task The task to execute
+     * Executes a runnable in the region that owns chunk coordinates.
+     *
+     * @param world world containing the chunk
+     * @param chunkX chunk x coordinate
+     * @param chunkZ chunk z coordinate
+     * @param task task to execute
      */
     public void executeChunk(World world, int chunkX, int chunkZ, Runnable task) {
         scheduler.execute(
@@ -50,9 +62,10 @@ public class LocationScheduler {
     }
 
     /**
-     * Execute a task in the region of the given chunk
-     * @param chunk The chunk to execute the task in
-     * @param task The task to execute
+     * Executes a runnable in the region that owns a chunk.
+     *
+     * @param chunk chunk whose region owns the work
+     * @param task task to execute
      */
     public void executeChunk(Chunk chunk, Runnable task) {
         executeChunk(
@@ -64,10 +77,11 @@ public class LocationScheduler {
     }
 
     /**
-     * Run a scheduled task in the region of the given location
-     * @param location The location to run the task in
-     * @param task The task to run
-     * @return The scheduled task
+     * Runs a scheduled task in the region that owns a location.
+     *
+     * @param location location whose region owns the work
+     * @param task task to run
+     * @return scheduled task handle
      */
     public ScheduledTask run(Location location, Consumer<ScheduledTask> task) {
         return scheduler.run(
@@ -78,12 +92,13 @@ public class LocationScheduler {
     }
 
     /**
-     * Run a scheduled task in the region of the given chunk coordinates
-     * @param world The world of the chunk
-     * @param chunkX The x coordinate of the chunk
-     * @param chunkZ The z coordinate of the chunk
-     * @param task The task to run
-     * @return The scheduled task
+     * Runs a scheduled task in the region that owns chunk coordinates.
+     *
+     * @param world world containing the chunk
+     * @param chunkX chunk x coordinate
+     * @param chunkZ chunk z coordinate
+     * @param task task to run
+     * @return scheduled task handle
      */
     public ScheduledTask run(World world, int chunkX, int chunkZ, Consumer<ScheduledTask> task) {
         return scheduler.run(
@@ -96,10 +111,11 @@ public class LocationScheduler {
     }
 
     /**
-     * Run a scheduled task in the region of the given chunk
-     * @param chunk The chunk to run the task in
-     * @param task The task to run
-     * @return The scheduled task
+     * Runs a scheduled task in the region that owns a chunk.
+     *
+     * @param chunk chunk whose region owns the work
+     * @param task task to run
+     * @return scheduled task handle
      */
     public ScheduledTask run(Chunk chunk, Consumer<ScheduledTask> task) {
         return run(
@@ -111,11 +127,14 @@ public class LocationScheduler {
     }
 
     /**
-     * Run a delayed scheduled task in the region of the given location
-     * @param location The location to run the task in
-     * @param delay The delay before running the task
-     * @param task The task to run
-     * @return The scheduled task
+     * Runs a delayed task in the region that owns a location.
+     * <p>
+     * The duration is converted to ticks with {@code delay.toMillis() / 50}.
+     *
+     * @param location location whose region owns the work
+     * @param delay delay before running the task
+     * @param task task to run
+     * @return scheduled task handle
      */
     public ScheduledTask runDelayed(Location location, Duration delay, Consumer<ScheduledTask> task) {
         return runDelayed(
@@ -126,11 +145,12 @@ public class LocationScheduler {
     }
 
     /**
-     * Run a delayed scheduled task in the region of the given location
-     * @param location The location to run the task in
-     * @param delay The delay before running the task
-     * @param task The task to run
-     * @return The scheduled task
+     * Runs a delayed task in the region that owns a location.
+     *
+     * @param location location whose region owns the work
+     * @param delay delay in server ticks
+     * @param task task to run
+     * @return scheduled task handle
      */
     public ScheduledTask runDelayed(Location location, long delay, Consumer<ScheduledTask> task) {
         return scheduler.runDelayed(
@@ -142,13 +162,16 @@ public class LocationScheduler {
     }
 
     /**
-     * Run a delayed scheduled task in the region of the given chunk coordinates
-     * @param world The world of the chunk
-     * @param chunkX The x coordinate of the chunk
-     * @param chunkZ The z coordinate of the chunk
-     * @param delay The delay before running the task
-     * @param task The task to run
-     * @return The scheduled task
+     * Runs a delayed task in the region that owns chunk coordinates.
+     * <p>
+     * The duration is converted to ticks with {@code delay.toMillis() / 50}.
+     *
+     * @param world world containing the chunk
+     * @param chunkX chunk x coordinate
+     * @param chunkZ chunk z coordinate
+     * @param delay delay before running the task
+     * @param task task to run
+     * @return scheduled task handle
      */
     public ScheduledTask runDelayed(World world, int chunkX, int chunkZ, Duration delay, Consumer<ScheduledTask> task) {
         return runDelayed(
@@ -161,13 +184,14 @@ public class LocationScheduler {
     }
 
     /**
-     * Run a delayed scheduled task in the region of the given chunk coordinates
-     * @param world The world of the chunk
-     * @param chunkX The x coordinate of the chunk
-     * @param chunkZ The z coordinate of the chunk
-     * @param delay The delay before running the task
-     * @param task The task to run
-     * @return The scheduled task
+     * Runs a delayed task in the region that owns chunk coordinates.
+     *
+     * @param world world containing the chunk
+     * @param chunkX chunk x coordinate
+     * @param chunkZ chunk z coordinate
+     * @param delay delay in server ticks
+     * @param task task to run
+     * @return scheduled task handle
      */
     public ScheduledTask runDelayed(World world, int chunkX, int chunkZ, long delay, Consumer<ScheduledTask> task) {
         return scheduler.runDelayed(
@@ -181,11 +205,14 @@ public class LocationScheduler {
     }
 
     /**
-     * Run a delayed scheduled task in the region of the given chunk
-     * @param chunk The chunk to run the task in
-     * @param delay The delay before running the task
-     * @param task The task to run
-     * @return The scheduled task
+     * Runs a delayed task in the region that owns a chunk.
+     * <p>
+     * The duration is converted to ticks with {@code delay.toMillis() / 50}.
+     *
+     * @param chunk chunk whose region owns the work
+     * @param delay delay before running the task
+     * @param task task to run
+     * @return scheduled task handle
      */
     public ScheduledTask runDelayed(Chunk chunk, Duration delay, Consumer<ScheduledTask> task) {
         return runDelayed(
@@ -198,11 +225,12 @@ public class LocationScheduler {
     }
 
     /**
-     * Run a delayed scheduled task in the region of the given chunk
-     * @param chunk The chunk to run the task in
-     * @param delay The delay before running the task
-     * @param task The task to run
-     * @return The scheduled task
+     * Runs a delayed task in the region that owns a chunk.
+     *
+     * @param chunk chunk whose region owns the work
+     * @param delay delay in server ticks
+     * @param task task to run
+     * @return scheduled task handle
      */
     public ScheduledTask runDelayed(Chunk chunk, long delay, Consumer<ScheduledTask> task) {
         return runDelayed(
@@ -215,12 +243,15 @@ public class LocationScheduler {
     }
 
     /**
-     * Schedule a repeating task in the region of the given location
-     * @param location The location to run the task in
-     * @param delay The delay before running the task
-     * @param period The period between task executions
-     * @param task The task to run
-     * @return The scheduled task
+     * Schedules a repeating task in the region that owns a location.
+     * <p>
+     * Durations are converted to ticks with {@code duration.toMillis() / 50}.
+     *
+     * @param location location whose region owns the work
+     * @param delay initial delay
+     * @param period period between executions
+     * @param task task to run
+     * @return scheduled task handle
      */
     public ScheduledTask schedule(Location location, Duration delay, Duration period, Consumer<ScheduledTask> task) {
         return schedule(
@@ -232,12 +263,13 @@ public class LocationScheduler {
     }
 
     /**
-     * Schedule a repeating task in the region of the given location
-     * @param location The location to run the task in
-     * @param delay The delay before running the task
-     * @param period The period between task executions
-     * @param task The task to run
-     * @return The scheduled task
+     * Schedules a repeating task in the region that owns a location.
+     *
+     * @param location location whose region owns the work
+     * @param delay initial delay in server ticks
+     * @param period period between executions in server ticks
+     * @param task task to run
+     * @return scheduled task handle
      */
     public ScheduledTask schedule(Location location, long delay, long period, Consumer<ScheduledTask> task) {
         return scheduler.runAtFixedRate(
@@ -250,14 +282,17 @@ public class LocationScheduler {
     }
 
     /**
-     * Schedule a repeating task in the region of the given chunk coordinates
-     * @param world The world of the chunk
-     * @param chunkX The x coordinate of the chunk
-     * @param chunkZ The z coordinate of the chunk
-     * @param delay The delay before running the task
-     * @param period The period between task executions
-     * @param task The task to run
-     * @return The scheduled task
+     * Schedules a repeating task in the region that owns chunk coordinates.
+     * <p>
+     * Durations are converted to ticks with {@code duration.toMillis() / 50}.
+     *
+     * @param world world containing the chunk
+     * @param chunkX chunk x coordinate
+     * @param chunkZ chunk z coordinate
+     * @param delay initial delay
+     * @param period period between executions
+     * @param task task to run
+     * @return scheduled task handle
      */
     public ScheduledTask schedule(World world, int chunkX, int chunkZ, Duration delay, Duration period, Consumer<ScheduledTask> task) {
         return schedule(
@@ -271,14 +306,15 @@ public class LocationScheduler {
     }
 
     /**
-     * Schedule a repeating task in the region of the given chunk coordinates
-     * @param world The world of the chunk
-     * @param chunkX The x coordinate of the chunk
-     * @param chunkZ The z coordinate of the chunk
-     * @param delay The delay before running the task
-     * @param period The period between task executions
-     * @param task The task to run
-     * @return The scheduled task
+     * Schedules a repeating task in the region that owns chunk coordinates.
+     *
+     * @param world world containing the chunk
+     * @param chunkX chunk x coordinate
+     * @param chunkZ chunk z coordinate
+     * @param delay initial delay in server ticks
+     * @param period period between executions in server ticks
+     * @param task task to run
+     * @return scheduled task handle
      */
     public ScheduledTask schedule(World world, int chunkX, int chunkZ, long delay, long period, Consumer<ScheduledTask> task) {
         return scheduler.runAtFixedRate(
@@ -293,12 +329,15 @@ public class LocationScheduler {
     }
 
     /**
-     * Schedule a repeating task in the region of the given chunk
-     * @param chunk The chunk to run the task in
-     * @param delay The delay before running the task
-     * @param period The period between task executions
-     * @param task The task to run
-     * @return The scheduled task
+     * Schedules a repeating task in the region that owns a chunk.
+     * <p>
+     * Durations are converted to ticks with {@code duration.toMillis() / 50}.
+     *
+     * @param chunk chunk whose region owns the work
+     * @param delay initial delay
+     * @param period period between executions
+     * @param task task to run
+     * @return scheduled task handle
      */
     public ScheduledTask schedule(Chunk chunk, Duration delay, Duration period, Consumer<ScheduledTask> task) {
         return schedule(
@@ -312,12 +351,13 @@ public class LocationScheduler {
     }
 
     /**
-     * Schedule a repeating task in the region of the given chunk
-     * @param chunk The chunk to run the task in
-     * @param delay The delay before running the task
-     * @param period The period between task executions
-     * @param task The task to run
-     * @return The scheduled task
+     * Schedules a repeating task in the region that owns a chunk.
+     *
+     * @param chunk chunk whose region owns the work
+     * @param delay initial delay in server ticks
+     * @param period period between executions in server ticks
+     * @param task task to run
+     * @return scheduled task handle
      */
     public ScheduledTask schedule(Chunk chunk, long delay, long period, Consumer<ScheduledTask> task) {
         return schedule(

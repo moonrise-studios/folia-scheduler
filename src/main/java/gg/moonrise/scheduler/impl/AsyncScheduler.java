@@ -8,23 +8,34 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
- * Represents the AsyncScheduler class.
+ * Convenience wrapper around Paper's asynchronous scheduler.
+ * <p>
+ * Use this scheduler for storage, file IO, network calls, serialization, CPU
+ * work, and other background work that does not directly touch Bukkit world,
+ * entity, inventory, or block state.
  */
 public class AsyncScheduler {
 
     private final JavaPlugin plugin;
     private final io.papermc.paper.threadedregions.scheduler.AsyncScheduler scheduler;
 
+    /**
+     * Creates a wrapper for Paper's async scheduler.
+     *
+     * @param plugin plugin instance used as the scheduler task owner
+     * @param scheduler Paper async scheduler
+     */
     public AsyncScheduler(JavaPlugin plugin, io.papermc.paper.threadedregions.scheduler.AsyncScheduler scheduler) {
         this.plugin = plugin;
         this.scheduler = scheduler;
     }
 
     /**
-     * Schedule a repeating task to run asynchronously.
-     * @param task The task to run
-     * @param period The period between successive runs of the task
-     * @return The ScheduledTask representing the scheduled task
+     * Schedules a repeating async task with no initial delay.
+     *
+     * @param task task to run
+     * @param period period between executions
+     * @return scheduled task handle
      */
     public ScheduledTask schedule(Consumer<ScheduledTask> task, Duration period) {
         return schedule(
@@ -36,11 +47,12 @@ public class AsyncScheduler {
     }
 
     /**
-     * Schedule a repeating task to run asynchronously.
-     * @param task The task to run
-     * @param delay The delay before running the task
-     * @param period The period between successive runs of the task
-     * @return The ScheduledTask representing the scheduled task
+     * Schedules a repeating async task.
+     *
+     * @param task task to run
+     * @param delay initial delay
+     * @param period period between executions
+     * @return scheduled task handle
      */
     public ScheduledTask schedule(Consumer<ScheduledTask> task, Duration delay, Duration period) {
         return schedule(
@@ -52,28 +64,30 @@ public class AsyncScheduler {
     }
 
     /**
-     * Schedule a repeating task to run asynchronously.
-     * @param task The task to run
-     * @param delayTicks The delay in ticks before running the task
-     * @param periodTicks The period in ticks between successive runs of the task
-     * @param unit The time unit for delay and period
-     * @return The ScheduledTask representing the scheduled task
+     * Schedules a repeating async task using an explicit time unit.
+     *
+     * @param task task to run
+     * @param delay initial delay in {@code unit}
+     * @param period period between executions in {@code unit}
+     * @param unit time unit for delay and period
+     * @return scheduled task handle
      */
-    public ScheduledTask schedule(Consumer<ScheduledTask> task, long delayTicks, long periodTicks, TimeUnit unit) {
+    public ScheduledTask schedule(Consumer<ScheduledTask> task, long delay, long period, TimeUnit unit) {
         return scheduler.runAtFixedRate(
                 plugin,
                 task,
-                delayTicks,
-                periodTicks,
+                delay,
+                period,
                 unit
         );
     }
 
     /**
-     * Run a task asynchronously after a delay.
-     * @param task The task to run
-     * @param delay The delay before running the task
-     * @return The ScheduledTask representing the scheduled task
+     * Runs an async task after a duration delay.
+     *
+     * @param task task to run
+     * @param delay delay before running the task
+     * @return scheduled task handle
      */
     public ScheduledTask runDelayed(Consumer<ScheduledTask> task, Duration delay) {
         return scheduler.runDelayed(
@@ -85,25 +99,27 @@ public class AsyncScheduler {
     }
 
     /**
-     * Run a task asynchronously after a delay.
-     * @param task The task to run
-     * @param delayTicks The delay in ticks before running the task
-     * @param unit The time unit for the delay
-     * @return The ScheduledTask representing the scheduled task
+     * Runs an async task after a delay using an explicit time unit.
+     *
+     * @param task task to run
+     * @param delay delay in {@code unit}
+     * @param unit time unit for the delay
+     * @return scheduled task handle
      */
-    public ScheduledTask runDelayed(Consumer<ScheduledTask> task, long delayTicks, TimeUnit unit) {
+    public ScheduledTask runDelayed(Consumer<ScheduledTask> task, long delay, TimeUnit unit) {
         return scheduler.runDelayed(
                 plugin,
                 task,
-                delayTicks,
+                delay,
                 unit
         );
     }
 
     /**
-     * Run a task asynchronously immediately.
-     * @param task The task to run
-     * @return The ScheduledTask representing the scheduled task
+     * Runs an async task immediately.
+     *
+     * @param task task to run
+     * @return scheduled task handle
      */
     public ScheduledTask run(Consumer<ScheduledTask> task) {
         return scheduler.runNow(plugin, task);
