@@ -6,9 +6,8 @@ plugins {
 
 var id = "folia-scheduler"
 var domain = "gg.moonrise.scheduler"
-var apiVersion = "1.0.0"
+var apiVersion = "1.0.1"
 val isRelease = providers.gradleProperty("isRelease").map(String::toBoolean).getOrElse(false)
-val publishVersion = if (isRelease) apiVersion else "$apiVersion-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -54,7 +53,7 @@ publishing {
 
             groupId = domain
             artifactId = id
-            version = publishVersion
+            version = apiVersion
 
             pom {
                 name.set(id)
