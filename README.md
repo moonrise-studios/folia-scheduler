@@ -36,9 +36,9 @@ runtime dependency loader.
 
 ```diff
 dependencies {
-+   compileOnly("gg.moonrise.scheduler:folia-scheduler:1.0.0")
++   compileOnly("gg.moonrise.scheduler:folia-scheduler:1.0.1")
 +   // Or, while testing unreleased changes:
-+   // compileOnly("gg.moonrise.scheduler:folia-scheduler:1.0.0-SNAPSHOT")
++   // compileOnly("gg.moonrise.scheduler:folia-scheduler:1.0.1-SNAPSHOT")
 }
 ```
 
@@ -80,7 +80,7 @@ public final class MyPluginLoader implements PluginLoader {
 +               "https://repo.moonrise.gg/repository/maven-snapshots"
 +       ).build());
 +       resolver.addDependency(new Dependency(
-+               new DefaultArtifact("gg.moonrise.scheduler:folia-scheduler:1.0.0"),
++               new DefaultArtifact("gg.moonrise.scheduler:folia-scheduler:1.0.1"),
 +               null
 +       ));
 +
@@ -101,7 +101,7 @@ plugins {
 }
 
 dependencies {
-+   implementation("gg.moonrise.scheduler:folia-scheduler:1.0.0")
++   implementation("gg.moonrise.scheduler:folia-scheduler:1.0.1")
 }
 
 tasks.shadowJar {
